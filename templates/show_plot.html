@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cluster Plot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+</head>
+<body>
+    {% extends "base.html" %}
+    {% block content %}
+    <section class="center">
+        <h1>Your data</h1>
+        <div id="plot-container" class="plot-container">
+            <div class="loading-wave" id="loader">
+                <div class="loading-bar"></div>
+                <div class="loading-bar"></div>
+                <div class="loading-bar"></div>
+                <div class="loading-bar"></div>
+              </div>    
+            <p id="loading-message">Processing... Please wait.</p>
+            <iframe id="plot-frame" src="" width="100%" height="600px" style="display: none;"></iframe>
+            <p id="info">Each point in this 3D space represents an image of your folder</p>
+        </div>
+        <h2>Download Your Sorted Images here</h2>
+        <div class="center_btn">
+            <form method="get" action="{{ url_for('download_zip', task_id=task_id) }}">
+                <button class="btn" id="btn" type="submit">Download</button>
+            </form>
+        </div>
+    </section> 
+    
+    <script nonce="{{ nonce }}">
+        function checkStatus() {
+            $.ajax({
+                url: "{{ url_for('task_status', task_id=task_id) }}",
+                success: function(data) {
+                    if (data.status === "SUCCESS") {
+                        $("#loading-message").hide();
+                        $("#loader").hide();
+                        $("#plot-frame").attr("src", data.result).show();
+                        $("#btn").show();
+                        $("#info").show();
+                    } else if (data.status === "PENDING") {
+                        setTimeout(checkStatus, 2000); // Retry after 2 seconds
+                        $("#btn").hide();
+                        $("#info").hide();
+                    } else {
+                        $("#loading-message").text("An error occurred.");
+                        $("#btn").hide();
+                        $("#info").hide();
+                    }
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            checkStatus();
+        });
+    </script>
+    {% endblock %}
+</body>
+</html>

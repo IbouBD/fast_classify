@@ -1,0 +1,37 @@
+services:
+  web:
+    build: .
+    container_name: flask_app
+    command: flask run --host=0.0.0.0
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - celery_worker
+      - celery_beat
+
+  celery_worker:
+    build: .
+    container_name: celery_worker
+    command: celery -A app.celery worker --loglevel=info --concurrency=2 --pool=solo
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+
+  celery_beat:
+    build: .
+    container_name: celery_beat
+    command: celery -A app.celery beat --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest  # Change to the latest version of Redis
+    container_name: redis
+    ports:
+      - "6379:6379"

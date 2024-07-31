@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="static/style.css">
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    {% extends "base.html" %}
+
+    {% block title %}Home{% endblock %}
+    {% block content %}
+    <section class="s1">
+        <div class="c1">
+            <div class="bt">
+                <div class="Presentation">
+                    <h1 class="title">Discover the <br> 
+                        most powerfull <br>
+                        clustering method <br>
+                        for images.
+                    </h1>
+                    <p>Welcome to our AI-powered image classification website ! <br>
+                       Here, you will find a seamless and intuitive platform that <br>
+                       empowers you to effortlessly classify images with clustering method. <br>
+                       With this, you can classify your images in a few seconds.
+                    </p>
+                    <div><p><a class="btnl" href="#upload">Get started</a></p></div>
+                </div>
+            </div>
+            <div class="expo-container">
+                <iframe class="expo" src="{{ url_for('static', filename='bp_expo.html') }}" ></iframe>
+              </div>
+        </div>
+        <div class="bt">
+            <h2>
+                Elevate Your Visual Experiences with Our AI- <br>Powered Solutions
+            </h2>
+            <h1 class="hug" style="display: none;">
+                Unlock the Future
+            </h1>
+            </div>
+    </section>
+    <section class="s2" style="display: none;">
+        <div class="pm1">
+            <div class="p1">
+                <h1>How it works</h1>
+                <p class="t2">Our AI-powered image classification website leverages cutting-edge technology to simplify image clustering. <br>
+                   Upload your images, and our platform will handle the rest. Our advanced algorithms, including VGG19 for feature <br>
+                   extraction, t-SNE/UMAP for dimensionality reduction, and K-Means for clustering, analyze your images and group <br>
+                   similar ones together. Whether you're organizing a photo collection, sorting product images, or tackling any <br>
+                   image classification task, our platform offers an efficient, state-of-the-art solution.
+                </p>
+            </div>
+            <div class="img_group">
+                <img src="{{ url_for('static', filename='icons8-ajouter-une-image-96.png') }}" alt="example">
+                <img src="{{ url_for('static', filename='icons8-down-arrow-64.png') }}" alt="example">
+                <img src="{{ url_for('static', filename='icons8-analyse-de-la-croissance-financière-96.png') }}" alt="example">
+                <img src="{{ url_for('static', filename='icons8-down-arrow-64.png') }}" alt="example">
+                <img src="{{ url_for('static', filename='icons8-ai-96.png') }}" alt="example">
+                <img src="{{ url_for('static', filename='icons8-down-arrow-64.png') }}" alt="example">
+                <img src="{{ url_for('static', filename='icons8-coche-96.png') }}" alt="example">
+            </div>
+        </div>
+
+        <div class="comparaison">
+            <img src="{{ url_for('static', filename='Comparaison.JPG') }}" alt="comparaison">
+            <div class="bt">
+                <h3>
+                    Our AI-powered image clustering in action: VGG19 feature extraction (top) naturally groups similar images, while t-SNE with K-Means (bottom) demonstrates our system's automatic classification capabilities.
+                </h3>
+            </div>
+            
+        </div>
+        
+        <div class="pm2">
+            <div class="p2">
+                <h1>Our Features</h1>
+                <p class="t2">Our AI-powered image classification website offers a range of advanced features to optimize your image 
+                   classification tasks:
+                </p>
+                <ul class="ul2">
+                    <li>Easy image upload and processing</li>
+                    <li>VGG19-based feature extraction for deep image analysis</li>
+                    <li>Advanced clustering using t-SNE/UMAP and K-Means</li>
+                    <li>Customizable number of clusters</li>
+                    <li>Intuitive interface with real-time results</li>
+                    <li>2D/3D visualization of image clusters</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="p3">
+            <h1>Why Choose Us</h1>
+            <p class="t2">Our approach offers significant advantages over traditional image classification methods:
+            </p>
+            <ul class="ul2">
+                <li>Unsupervised learning: No need for labeled data</li>
+                <li>Scalability: Efficiently handle large image datasets</li>
+                <li>Flexibility: Adjust clustering parameters to suit your needs</li>
+                <li>Deep learning powered: Benefit from state-of-the-art computer vision techniques</li>
+            </ul>
+        </div>
+        
+        <div class="pm4">
+            <div class="p4">
+                <h1>Applications</h1>
+                <div>
+                    <p class="t2">Our image classification service can be applied in various domains, including:
+                    </p>
+                    <ul class="ul2">
+                        <li>E-commerce: Organize product catalogs</li>
+                        <li>Photography: Sort and categorize large photo collections</li>
+                        <li>Medical imaging: Group similar medical images for research or diagnosis</li>
+                        <li>Content moderation: Identify and group similar content</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="img_group">
+                <img src="{{ url_for('static', filename='icons8-e-commerce-96.png') }}" alt="example"/>
+                <img src="{{ url_for('static', filename='icons8-appareil-photo-96.png') }}" alt="example"/>
+                <img src="{{ url_for('static', filename='icons8-stéthoscope-96.png') }}" alt="example"/>
+                <img src="{{ url_for('static', filename='icons8-contenu-adulte-96.png') }}" alt="example"/>
+            </div>
+        </div>
+    </section>
+    
+    <section class="upload" id="upload">
+        <div class="bt">
+            <h1>Let's try our service</h1>
+        <h2>Upload Images</h2>
+        <form method="post" enctype="multipart/form-data">
+            {{ form.csrf_token }}
+            <div class="center2">
+                <div class="class">
+                    <h3>Choose the number of classes</h3>
+                    
+                    <div class="number-control">
+                        <button type="button" id="btn-moins" class="number-left"></button>
+                        {{ form.nb_cluster(class="number-quantity", value='3') }}
+                        <button type="button" id="btn-plus" class="number-right"></button>
+                    </div>
+                </div>
+                <div >
+                    <label class="custum-file-upload" for="file" id="drop-zone">
+                        <p>Allowed files extensions :  <br>.png .jpg .jpeg .bmp</p>
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24"><g stroke-width="0" id="SVGRepo_bgCarrier"></g><g stroke-linejoin="round" stroke-linecap="round" id="SVGRepo_tracerCarrier"></g><g id="SVGRepo_iconCarrier"> <path fill="" d="M10 1C9.73478 1 9.48043 1.10536 9.29289 1.29289L3.29289 7.29289C3.10536 7.48043 3 7.73478 3 8V20C3 21.6569 4.34315 23 6 23H7C7.55228 23 8 22.5523 8 22C8 21.4477 7.55228 21 7 21H6C5.44772 21 5 20.5523 5 20V9H10C10.5523 9 11 8.55228 11 8V3H18C18.5523 3 19 3.44772 19 4V9C19 9.55228 19.4477 10 20 10C20.5523 10 21 9.55228 21 9V4C21 2.34315 19.6569 1 18 1H10ZM9 7H6.41421L9 4.41421V7ZM14 15.5C14 14.1193 15.1193 13 16.5 13C17.8807 13 19 14.1193 19 15.5V16V17H20C21.1046 17 22 17.8954 22 19C22 20.1046 21.1046 21 20 21H13C11.8954 21 11 20.1046 11 19C11 17.8954 11.8954 17 13 17H14V16V15.5ZM16.5 11C14.142 11 12.2076 12.8136 12.0156 15.122C10.2825 15.5606 9 17.1305 9 19C9 21.2091 10.7909 23 13 23H20C22.2091 23 24 21.2091 24 19C24 17.1305 22.7175 15.5606 20.9844 15.122C20.7924 12.8136 18.858 11 16.5 11Z" clip-rule="evenodd" fill-rule="evenodd"></path> </g></svg>
+                        </div>
+                        <div class="text">
+                           <span>Choose a folder to be Sorted</span>
+                        </div>
+                        
+                        <input name="files" type="file" id="file" webkitdirectory directory multiple required/>
+                    <button class="btn" type="submit">{{ form.submit()}} submit</button>
+                </label>
+                
+                </div>
+            </div>
+            
+        </form>
+        </div>
+        
+    </section>
+    
+    
+    <script nonce="{{ nonce }}" src="{{ url_for('static', filename='js/cluster_btn.js') }}"></script>
+    <script nonce="{{ nonce }}" src="{{ url_for('static', filename='js/drag_and_drop.js') }}"></script>
+    <script nonce="{{ nonce }}" src="{{ url_for('static', filename='js/file_verif.js') }}"></script>
+    <script>
+            
+
+    </script>
+    {% endblock %}
+</body>
+</html>
