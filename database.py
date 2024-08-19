@@ -50,20 +50,19 @@ def create_app():
 
     # Configuration de Celery
     celery = Celery(app.import_name, backend='redis://redis:6379/0', broker='redis://redis:6379/0')  # Update this line
-    CELERY_IMPORTS = ('app.tasks.test')
-    CELERY_TASK_RESULT_EXPIRES = 30
-    CELERY_TIMEZONE = 'UTC'
-
-    CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
-    CELERY_TASK_SERIALIZER = 'json'
-    CELERY_RESULT_SERIALIZER = 'json'
-
-    CELERYBEAT_SCHEDULE = {
-        'test-celery': {
-            'task': 'app.tasks.tasks.del_file',
-            'schedule': crontab(minute="*"),
-        }
-    }
+    app.config.from_mapping(
+        CELERY=dict(
+            broker_url="redis://redis:6379/0",
+            result_backend="redis://redis:6379/0",
+            task_ignore_result=True,
+            beat_schedule={
+                "task-every-10-seconds": {
+                    "task": "app.tasks.del_file",
+                    "schedule": 10,
+                }
+            },
+        ),
+    )
     celery.conf.update(app.config)
 
     # Configuration de sécurité supplémentaire

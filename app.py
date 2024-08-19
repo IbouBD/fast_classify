@@ -6,7 +6,7 @@ from flask_login import UserMixin, LoginManager, login_user, logout_user, login_
 from database import create_app, db, User, Role, user_datastore, AnonymousUser
 from flask_security.utils import hash_password
 from forms import UploadForm, RegistrationForm, LoginForm
-from tasks import  process_images, celery
+from tasks import  process_images, del_file, celery
 from utils import *
 from celery.result import AsyncResult
 from flask_bcrypt import Bcrypt
@@ -83,14 +83,14 @@ async def index():
             user_data = os.path.join(app.config['SORTED_FOLDER'], str(current_user.id))
             os.makedirs(user_folder, exist_ok=True)
             os.makedirs(user_data, exist_ok=True)
+            session['user_id'] =  str(current_user.id)
+
         else:
-            
-            anonymous_user_id= session.get('anonymous_id')
-            
             user_folder = os.path.join(app.config['UPLOAD_FOLDER'], current_user.id)
             user_data = os.path.join(app.config['SORTED_FOLDER'], current_user.id)
             os.makedirs(user_folder, exist_ok=True)
             os.makedirs(user_data, exist_ok=True)
+            session['user_id'] = current_user.id
 
         for file in files:
             if file and allowed_file(file.filename):
@@ -101,13 +101,14 @@ async def index():
 
         if len(image_data) < nb_cluster:
             flash(f"You can't have more groups than images, number of groups : {nb_cluster}, number of images : {len(image_data)}", 'danger')
-            image_data = []
             return redirect(url_for('index'))
-    
+        clustered_files = session.get('clustered_files')
+        print("#######",clustered_files)
         task = process_images.apply_async(args=[image_data, nb_cluster, user_folder, user_data])
         session['task_id'] = task.id
+
         
-        return redirect(url_for('show_plot', task_id=task.id))
+        return redirect(url_for('show_plot', task_id=task.id, clustered_files=clustered_files))
 
     return render_template("index.html", form=form, plot_url=None)
 
@@ -115,6 +116,12 @@ async def index():
 def task_status(task_id):
     task = AsyncResult(task_id, app=celery)
     if task.state == 'SUCCESS':
+        print('###############################')
+        result = task.get()
+        print('###############################')
+        output_path, clustered_files = result
+        clustered_files = dict(sorted(clustered_files.items()))
+        session['clustered_files'] = clustered_files
         return jsonify({'status': 'SUCCESS', 'result': url_for('static', filename='cluster_plot.html')})
     elif task.state == 'PENDING':
         return jsonify({'status': 'PENDING'})
@@ -160,7 +167,8 @@ def download_zip(task_id):
             print(e)
             flash('The zip file does not exist.', 'danger')
             return redirect(url_for('show_plot', task_id=task_id))
-            
+
+         
     else:
         flash('The zip file does not exist.', 'danger')
         return redirect(url_for('show_plot', task_id=task_id))
@@ -225,6 +233,42 @@ def  logout():
     session.pop('username', None)
     flash('You have been logged out.', 'success')
     return render_template('login.html')
+
+@app.before_request
+def before_request_func():
+    one_minute_ago = time.time() - 180
+    if current_user.is_authenticated:
+        user_zip_folder = os.path.join(app.config['ZIP_FOLDER'], str(current_user.id))
+        user_sorted_folder = os.path.join(app.config['SORTED_FOLDER'], str(current_user.id))
+        print(user_sorted_folder)
+        check_time(user_zip_folder=user_zip_folder, user_sorted_folder=user_sorted_folder)
+    else:
+        user_zip_folder = os.path.join(app.config['ZIP_FOLDER'], current_user.id)
+        user_sorted_folder = os.path.join(app.config['SORTED_FOLDER'], current_user.id)
+        print(user_sorted_folder)
+        check_time(user_zip_folder=user_zip_folder, user_sorted_folder=user_sorted_folder)
+    print(user_sorted_folder)
+    if os.path.exists(SORTED_FOLDER):
+        for folder in os.listdir(SORTED_FOLDER):
+            folder_path = os.path.join(SORTED_FOLDER, folder)
+            if os.path.isdir(folder_path):
+                print(f'***************************************')
+                mtime = os.path.getmtime(folder_path)
+                print("******",mtime)
+                if mtime < one_minute_ago:
+                    print(folder_path, "*******")
+                    shutil.rmtree(folder_path)
+    if os.path.exists(ARCHIVE_NAME):
+        for folder in os.listdir(ARCHIVE_NAME):
+            folder_path = os.path.join(ARCHIVE_NAME, folder)
+            if os.path.isdir(folder_path):
+                print(f'***************************************')
+                mtime = os.path.getmtime(folder_path)
+                print("******",mtime)
+                if mtime < one_minute_ago:
+                    print(folder_path, "*******")
+                    shutil.rmtree(folder_path)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

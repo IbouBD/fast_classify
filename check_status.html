@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Check Task Status</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Processing...</h1>
+    <div id="status-message">Checking status...</div>
+    <script nonce="{{nonce}}">
+        function checkStatus() {
+            $.ajax({
+                url: "{{ url_for('task_status', task_id=task_id) }}",
+                success: function(data) {
+                    if (data.status === "SUCCESS") {
+                        window.location.href = data.result;
+                    } else if (data.status === "PENDING") {
+                        $("#status-message").text("Still processing...");
+                        setTimeout(checkStatus, 2000); // Retry after 2 seconds
+                    } else {
+                        $("#status-message").text("An error occurred.");
+                    }
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            checkStatus();
+        });
+    </script>
+</body>
+</html>

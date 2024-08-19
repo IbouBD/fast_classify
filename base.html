@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nav</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body> 
+    <nav>
+        <div class="nav1">
+            <h2>Classify Fast</h2>
+        </div>
+        <div class="nav2">
+            {% if session.loggedin %}
+            <ul class="nav2">
+                <li class="nav2">
+                    <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                </li>
+                <li class="nav2">
+                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+                <li class="nav2">
+                    <a class="nav-user" href="#">
+                        {{ session.username[0]|upper }}
+                    </a>
+                </li>
+            </ul>
+        {% else %}
+            <ul class="nav2">
+                <li class="nav2">
+                    <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                </li>
+                <li class="nav2">
+                    <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                </li>
+                <li class="nav2">
+                    <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                </li>
+            </ul>
+        {% endif %}
+    </nav>
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
